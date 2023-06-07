@@ -1,0 +1,19 @@
+{
+    "domain": "somfy_connected_thermostat",
+    "name": "Somfy Connected Thermostat",
+    "documentation": "https://github.com/GuillaumeNury/pySomfyConnectedThermostat",
+    "python_requires": ">=3.5",
+    "requirements": ["git+https://github.com/tooljose88/pySomfyConnectedThermostat.git#0.0.5"],
+    "dependencies": [],
+    "codeowners": ["topota"],
+    "translations": [],
+    "iot_class": "local_polling",
+    "config_flow": true,
+    "zeroconf": ["_somfy-connected-thermostat._tcp.local."],
+    "homeassistant": {
+      "services": [],
+      "components": ["climate"]
+    },
+    "version": "0.0.1"
+  }
+  

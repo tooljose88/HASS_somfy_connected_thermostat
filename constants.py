@@ -1,0 +1,1 @@
+DOMAIN = "somfy_connected_thermostat"
