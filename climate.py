@@ -2,19 +2,20 @@ import logging
 
 from homeassistant.components.climate import (
     ClimateEntity,
-    SUPPORT_TARGET_TEMPERATURE,
-    SUPPORT_PRESET_MODE,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_OFF,
     PRESET_NONE,
     PRESET_AWAY,
     PRESET_HOME,
     PRESET_SLEEP
 )
 
+from homeassistant.components.climate.const import (
+    ClimateEntityFeature,
+    HVACMode,
+)
+
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    TEMP_CELSIUS,
+    UnitOfTemperature,
     CONF_USERNAME,
     CONF_PASSWORD
 )
@@ -79,10 +80,10 @@ class SomfyThermostatClimateEntity(ClimateEntity):
 
         self._current_temperature = None
         self._target_temperature = 8.0
-        self._hvac_mode = HVAC_MODE_OFF
+        self._hvac_list = [HVACMode.HEAT, HVACMode.OFF]
+        self._hvac_mode = HVACMode.OFF
         self._preset_mode = PRESET_NONE
-        self._supported_hvac_modes = [HVAC_MODE_HEAT, HVAC_MODE_OFF]
-        self._supported_preset_modes = [PRESET_NONE,PRESET_AWAY,PRESET_HOME,PRESET_SLEEP]
+        self._preset_modes = [PRESET_NONE,PRESET_AWAY,PRESET_HOME,PRESET_SLEEP]
 
     @property
     def name(self):
@@ -97,14 +98,14 @@ class SomfyThermostatClimateEntity(ClimateEntity):
     @property
     def temperature_unit(self):
         """Return the temperature unit."""
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     @property
     def supported_features(self):
         """Return the list of supported features."""
         return (
-            SUPPORT_TARGET_TEMPERATURE
-            | SUPPORT_PRESET_MODE
+            ClimateEntityFeature.TARGET_TEMPERATURE
+            | ClimateEntityFeature.PRESET_MODE
         )
 
     @property
@@ -128,14 +129,14 @@ class SomfyThermostatClimateEntity(ClimateEntity):
         return self._preset_mode
 
     @property
-    def hvac_modes(self):
+    def hvac_modes(self) -> list[HVACMode]:
         """Return the list of supported HVAC modes."""
-        return self._supported_hvac_modes
+        return self._hvac_list
 
     @property
     def preset_modes(self):
         """Return the list of supported preset modes."""
-        return self._supported_preset_modes
+        return self._preset_modes
     
     @property
     def max_temp(self):
@@ -179,9 +180,9 @@ class SomfyThermostatClimateEntity(ClimateEntity):
             self._preset_mode = PRESET_NONE
             # Set the HVAC mode based on the mode value from the response
             if thermostat_info.mode == HeatingMode.FREEZE.value:
-                self._hvac_mode = HVAC_MODE_OFF
+                self._hvac_mode = HVACMode.OFF
             else:
-                self._hvac_mode = HVAC_MODE_HEAT
+                self._hvac_mode = HVACMode.HEAT
                 # Set Preset Mode if is not manual
                 if thermostat_info.mode != HeatingMode.MANUAL.value:
                     self._preset_mode = thermostat_info.mode
@@ -199,7 +200,7 @@ class SomfyThermostatClimateEntity(ClimateEntity):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set the HVAC mode."""
-        if hvac_mode == HVAC_MODE_HEAT:
+        if hvac_mode == HVACMode.HEAT:
             hvac_mode = HeatingMode.MANUAL
         else:
             hvac_mode = HeatingMode.FREEZE
