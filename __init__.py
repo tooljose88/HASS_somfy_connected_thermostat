@@ -3,7 +3,7 @@ import logging
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD, Platform
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
@@ -85,7 +85,7 @@ async def async_setup_entry(hass, entry):
             }
 
         hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, "climate")
+            hass.config_entries.async_forward_entry_setups(entry, ["climate"])
         )
     except Exception as e:
         _LOGGER.error("Error setting up Somfy Connected Thermostat integration: %s", str(e))
